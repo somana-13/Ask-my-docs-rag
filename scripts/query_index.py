@@ -64,12 +64,7 @@ def format_evidence_summary(metadatas, max_points=3):
     return summary_points
 
 
-def main():
-    query = input("Enter your question: ").strip()
-
-    embedder = LocalEmbedder(model_name="all-MiniLM-L6-v2")
-    vector_store = ChromaVectorStore(path="chroma_db", collection_name="httpx_docs")
-
+def run_query(query, embedder, vector_store):
     query_embedding = embedder.embed_query(query)
     results = vector_store.query(query_embedding=query_embedding, n_results=MAX_RESULTS)
 
@@ -81,21 +76,17 @@ def main():
     filtered = keep_relevant_results(ids, documents, metadatas, distances)
     filtered = diversify_results(filtered)
 
+    print("\n" + "=" * 100)
+    print(f"QUESTION: {query}")
+    print("=" * 100)
+
     if not filtered:
-        print("\n" + "=" * 100)
-        print(f"QUESTION: {query}")
-        print("=" * 100)
         print("\nNo strong supporting evidence was found in the indexed documents.")
         return
 
     ids = [x[0] for x in filtered][:MAX_DISPLAY]
-    documents = [x[1] for x in filtered][:MAX_DISPLAY]
     metadatas = [x[2] for x in filtered][:MAX_DISPLAY]
     distances = [x[3] for x in filtered][:MAX_DISPLAY]
-
-    print("\n" + "=" * 100)
-    print(f"QUESTION: {query}")
-    print("=" * 100)
 
     print("\nTOP RETRIEVED EVIDENCE:")
     for i, (chunk_id, meta, dist) in enumerate(zip(ids, metadatas, distances), start=1):
@@ -116,6 +107,27 @@ def main():
     print("RAW TOP CHUNK:")
     print(metadatas[0].get("raw_text", "")[:1500])
     print("-" * 100)
+
+
+def main():
+    print("Starting Ask-My-Docs interactive retrieval...")
+    print("Type 'exit' to quit.\n")
+
+    embedder = LocalEmbedder(model_name="all-MiniLM-L6-v2")
+    vector_store = ChromaVectorStore(path="chroma_db", collection_name="httpx_docs")
+
+    while True:
+        query = input("\nEnter your question: ").strip()
+
+        if query.lower() in {"exit", "quit"}:
+            print("Exiting.")
+            break
+
+        if not query:
+            print("Please enter a question.")
+            continue
+
+        run_query(query, embedder, vector_store)
 
 
 if __name__ == "__main__":
