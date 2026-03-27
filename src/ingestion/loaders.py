@@ -14,30 +14,40 @@ def extract_doc_id(file_path: str) -> str:
     return name
 
 
+
+
 def split_markdown_by_headings(text: str):
+    """
+    Splits markdown into sections using #, ##, ### headings.
+    Returns a list of dicts with section_title and section_text.
+    """
     lines = text.splitlines()
     sections = []
-    current_title = "Introduction"
+    current_title = None
     current_lines = []
 
     heading_pattern = re.compile(r"^(#{1,3})\s+(.*)$")
 
     for line in lines:
         match = heading_pattern.match(line.strip())
+
         if match:
-            if current_lines:
+            # Save previous section only if it has meaningful content
+            if current_title is not None and any(l.strip() for l in current_lines):
                 sections.append(
                     {
                         "section_title": current_title,
                         "section_text": "\n".join(current_lines).strip(),
                     }
                 )
+
             current_title = match.group(2).strip()
             current_lines = []
         else:
             current_lines.append(line)
 
-    if current_lines:
+    # Save final section
+    if current_title is not None and any(l.strip() for l in current_lines):
         sections.append(
             {
                 "section_title": current_title,
