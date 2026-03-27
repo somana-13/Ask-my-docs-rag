@@ -108,3 +108,72 @@ Retrieved Evidence Includes:
 	•	authentication.md | Introduction
 	•	quickstart.md | Authentication
 	•	authentication.md | NetRC authentication
+-----------------------------------------------------------------------------------------------------
+Command To Run
+
+(.venv) somana@Mac ask-my-docs-rag % python -m scripts.query_index
+
+-----------------------------------------------------------------------------------------------------
+INPUT
+Enter your question: How do I configure authentication in HTTPX?
+
+OUTPUT
+
+TOP RETRIEVED EVIDENCE:
+1. authentication.md | NetRC authentication (chunk_id=data_raw_httpx_advanced_authentication_chunk_003, distance=0.7308)
+2. authentication.md | Introduction (chunk_id=data_raw_httpx_advanced_authentication_chunk_000, distance=0.7662)
+3. quickstart.md | Authentication (chunk_id=data_raw_httpx_quickstart_chunk_017, distance=0.7681)
+
+EVIDENCE-BASED SUMMARY:
+- [authentication.md | NetRC authentication] HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.  The `.netrc` config file allows authentication credentials to be associated with specified hosts....
+- [authentication.md | Introduction] Authentication can either be included on a per-request basis...  ```pycon >>> auth = httpx.BasicAuth(username="username", password="secret") >>> client = httpx.Client() >>> response = client.get("https://www.example.com/...
+- [quickstart.md | Authentication] HTTPX supports Basic and Digest HTTP authentication.  To provide Basic authentication credentials, pass a 2-tuple of plaintext `str` or `bytes` objects as the `auth` argument to the request functions:  ```pycon >>> httpx...
+
+SOURCES:
+- authentication.md | NetRC authentication
+- authentication.md | Introduction
+- quickstart.md | Authentication
+
+----------------------------------------------------------------------------------------------------
+RAW TOP CHUNK:
+HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.
+
+The `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.
+
+Example `.netrc` file:
+
+```
+machine example.org
+login example-username
+password example-password
+
+machine python-httpx.org
+login other-username
+password other-password
+```
+
+Some examples of configuring `.netrc` authentication with `httpx`.
+
+Use the default `.netrc` file in the users home directory:
+
+```pycon
+>>> auth = httpx.NetRCAuth()
+>>> client = httpx.Client(auth=auth)
+```
+
+Use an explicit path to a `.netrc` file:
+
+```pycon
+>>> auth = httpx.NetRCAuth(file="/path/to/.netrc")
+>>> client = httpx.Client(auth=auth)
+```
+
+Use the `NETRC` environment variable to configure a path to the `.netrc` file,
+or fallback to the default.
+
+```pycon
+>>> auth = httpx.NetRCAuth(file=os.environ.get("NETRC"))
+>>> client = httpx.Client(auth=auth)
+```
+
+The `NetRCAuth()` class uses [the `netrc.netrc()` function from the Python standard library](https://docs.python.org/3/library/netrc.html). See the documentation there for more details on exceptions that may be raised if the `.netrc` file is not found, or cannot be parsed.
