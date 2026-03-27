@@ -2,6 +2,17 @@
 
 A domain-specific “ask my docs” retrieval system built over technical documentation, designed to ground every response in retrieved evidence and surface clear citations.
 
+## Project Overview
+
+How It Works:
+
+1. Raw markdown technical docs are ingested and split into sections.
+2. Sections are chunked into overlapping retrieval units with metadata preserved.
+3. Each chunk is embedded using Sentence Transformers.
+4. Embeddings and metadata are stored in a persistent Chroma vector database.
+5. User queries are embedded and matched against the indexed chunks.
+6. The system returns the most relevant evidence with source-aware citations.
+
 ## Project Goal
 
 The goal of this project is to build a reliable documentation QA system that answers questions using retrieved evidence from a document corpus instead of relying only on model memory.
@@ -99,15 +110,23 @@ Given a user query:
 	•	the vector store retrieves the most relevant chunks
 	•	retrieved evidence is displayed with source and section citations
 
-Example Query
+----------------------------------------------------------------------------------------------------
+## Example Retrieval Output
 
-Question:
+### Query
 How do I configure authentication in HTTPX?
 
-Retrieved Evidence Includes:
-	•	authentication.md | Introduction
-	•	quickstart.md | Authentication
-	•	authentication.md | NetRC authentication
+### Retrieved Evidence
+TOP RETRIEVED EVIDENCE:
+1. authentication.md | NetRC authentication
+2. authentication.md | Introduction
+3. quickstart.md | Authentication
+
+### Evidence based summary
+- [authentication.md | NetRC authentication] HTTPX can be configured to use a .netrc file for authentication.
+- [authentication.md | Introduction] Authentication can be included on a per-request basis or configured on the client.
+- [quickstart.md | Authentication] HTTPX supports Basic and Digest HTTP authentication.
+
 -----------------------------------------------------------------------------------------------------
 Command To Run
 
