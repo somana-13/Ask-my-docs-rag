@@ -1,68 +1,66 @@
 # Ask My Docs RAG
 
-A domain-specific “ask my docs” retrieval system built over technical documentation, designed to ground every response in retrieved evidence and surface clear citations.
+A domain-specific retrieval system over technical documentation that returns **grounded evidence with citations** instead of relying only on model memory.
 
-## Project Overview
+## What it does
 
-How It Works:
+This project indexes a technical docs corpus and supports evidence-based question answering through:
 
-1. Raw markdown technical docs are ingested and split into sections.
-2. Sections are chunked into overlapping retrieval units with metadata preserved.
-3. Each chunk is embedded using Sentence Transformers.
-4. Embeddings and metadata are stored in a persistent Chroma vector database.
-5. User queries are embedded and matched against the indexed chunks.
-6. The system returns the most relevant evidence with source-aware citations.
-
-## Project Goal
-
-The goal of this project is to build a reliable documentation QA system that answers questions using retrieved evidence from a document corpus instead of relying only on model memory.
-
-This project is being developed in phases:
-
-- **Phase 1:** ingestion, chunking, embeddings, vector indexing, semantic retrieval, and citation-aware evidence display
-- **Phase 2:** hybrid retrieval, reranking, and explicit abstention
-- **Phase 3:** evaluation pipeline, golden dataset, and CI-based quality checks
-
-## Current Status
-
-### Phase 1 Complete
-The current system supports:
-
-- ingesting markdown technical documentation
-- splitting documents into section-aware chunks
-- preserving metadata for traceability and citation
-- embedding chunks using Sentence Transformers
-- indexing embeddings in a persistent Chroma vector store
-- retrieving semantically relevant chunks for a user query
-- displaying retrieved evidence with source and section citations
+- markdown document ingestion
+- section-aware chunking with overlap
+- semantic retrieval using embeddings
+- BM25 keyword retrieval
+- hybrid retrieval (dense + BM25)
+- cross-encoder reranking
+- abstention when evidence is weak
+- citation-aware evidence display
 
 ## Corpus
 
-This Phase 1 version uses a curated subset of the **HTTPX documentation** as the technical document corpus.
+This version uses a curated subset of the **HTTPX documentation**.
 
 ## Tech Stack
 
-- **Python**
-- **Sentence Transformers** for embeddings
-- **ChromaDB** for persistent vector storage
-- **Markdown-based ingestion pipeline**
-- **Terminal-based query interface**
+- Python
+- Sentence Transformers
+- ChromaDB
+- LangChain
+- BM25 / `rank-bm25`
+- Pytest
+
+## Current Features
+
+### Phase 1
+- ingest markdown docs
+- split into metadata-rich chunks
+- build persistent vector index
+- retrieve semantically relevant evidence
+- display source-aware citations
+
+### Phase 2
+- add BM25 lexical retrieval
+- combine dense + keyword retrieval
+- rerank hybrid candidates with a cross-encoder
+- filter weak results
+- abstain when strong supporting evidence is missing
 
 ## Project Structure
 
 ```text
 ask-my-docs-rag/
 ├── data/
-│   ├── raw/httpx/                 # Source technical docs corpus
+│   ├── raw/httpx/                 # Source docs corpus
 │   └── processed/
-│       ├── ingested_docs.json     # Parsed docs with section structure
-│       └── chunks.json            # Retrieval-ready chunks with metadata
-├── chroma_db/                     # Local persistent Chroma vector store
+│       ├── ingested_docs.json     # Parsed docs with sections
+│       └── chunks.json            # Retrieval-ready chunks
 ├── scripts/
-│   ├── ingest_docs.py             # Load raw markdown docs
-│   ├── build_chunks.py            # Section-aware chunking
-│   ├── build_index.py             # Generate embeddings and store in Chroma
-│   └── query_index.py             # Query the vector index and display evidence
+│   ├── ingest_docs.py             # Parse raw markdown docs
+│   ├── build_chunks.py            # Create overlapping chunks
+│   ├── build_index.py             # Embed chunks and store in Chroma
+│   ├── query_index.py             # Dense retrieval
+│   ├── query_bm25.py              # BM25 retrieval
+│   ├── query_hybrid.py            # Dense + BM25 retrieval
+│   └── query_reranked.py          # Hybrid retrieval + reranking + abstention
 ├── src/
 │   ├── ingestion/
 │   │   └── loaders.py
@@ -71,128 +69,81 @@ ask-my-docs-rag/
 │   ├── embeddings/
 │   │   └── embedder.py
 │   └── retrieval/
-│       └── vector_store.py
-└── tests/
+│       ├── vector_store.py
+│       ├── bm25_retriever.py
+│       ├── hybrid_retriever.py
+│       └── reranker.py
+├── tests/
+│   └── test_pipeline.py
+├── chroma_db/                     # Local vector store
+├── pytest.ini
+├── .gitignore
+└── README.md
 
-Pipeline Overview
+How it works
+	1.	Raw markdown docs are ingested and split by headings.
+	2.	Each section is chunked into overlapping retrieval units.
+	3.	Chunks are embedded and stored in ChromaDB.
+	4.	Queries can be answered through:
+	•	dense retrieval
+	•	BM25 retrieval
+	•	hybrid retrieval
+	5.	Hybrid candidates are reranked with a cross-encoder.
+	6.	If supporting evidence is too weak, the system abstains.
 
-1. Document Ingestion
+How to run
 
-Raw markdown documentation files are loaded and parsed into structured documents.
-Each document is split into sections using markdown headings.
+1. Ingest documents
+   python -m scripts.ingest_docs
 
-2. Section-Aware Chunking
+2. Build chunks
+   python -m scripts.build_chunks
 
-Each section is split into smaller overlapping chunks to make retrieval more precise while preserving context near boundaries.
+3. Build vector index
+   python -m scripts.build_index
 
-Current strategy:
-	•	character-based chunking
-	•	overlap between adjacent chunks
-	•	metadata preserved for every chunk
+4. Run dense retrieval
+   python -m scripts.query_index
 
-3. Embedding Generation
+5. Run BM25 retrieval
+   python -m scripts.query_bm25
 
-Each chunk is converted into a dense vector embedding using a Sentence Transformers model.
+6. Run hybrid retrieval
+   python -m scripts.query_hybrid
 
-To improve retrieval quality for technical docs, embeddings are generated from enriched chunk text that includes:
-	•	source filename
-	•	section title
-	•	chunk content
+7. Run hybrid retrieval + reranking + abstention
+   python -m scripts.query_reranked
 
-4. Vector Indexing
+8. Run tests
+   python -m pytest -v
 
-Embeddings, chunk text, and metadata are stored in a persistent Chroma collection for semantic search.
 
-5. Retrieval
+Example queries
+	•	How do I configure authentication in HTTPX?
+	•	DigestAuth
+	•	NetRCAuth
+	•	How do timeouts work in HTTPX?
 
-Given a user query:
-	•	the query is embedded
-	•	the vector store retrieves the most relevant chunks
-	•	retrieved evidence is displayed with source and section citations
+Example abstention
 
-----------------------------------------------------------------------------------------------------
-## Example Retrieval Output
+For questions outside the indexed corpus, the system refuses to answer:
 
-### Query
-How do I configure authentication in HTTPX?
+I could not find strong enough supporting evidence in the indexed documents.
 
-### Retrieved Evidence
-TOP RETRIEVED EVIDENCE:
-1. authentication.md | NetRC authentication
-2. authentication.md | Introduction
-3. quickstart.md | Authentication
+### Why this project matters
 
-### Evidence based summary
-- [authentication.md | NetRC authentication] HTTPX can be configured to use a .netrc file for authentication.
-- [authentication.md | Introduction] Authentication can be included on a per-request basis or configured on the client.
-- [quickstart.md | Authentication] HTTPX supports Basic and Digest HTTP authentication.
+This project demonstrates practical RAG system design:
+	•	retrieval over real documentation
+	•	metadata-aware chunking
+	•	hybrid search
+	•	reranking for better precision
+	•	trust-oriented abstention behavior
+	•	test-backed preprocessing reliability
 
------------------------------------------------------------------------------------------------------
-Command To Run
+Next Step
 
-(.venv) somana@Mac ask-my-docs-rag % python -m scripts.query_index
+Phase 3 will add:
+	•	a golden evaluation dataset
+	•	faithfulness checks
+	•	automated evaluation in CI
 
------------------------------------------------------------------------------------------------------
-INPUT
-Enter your question: How do I configure authentication in HTTPX?
-
-OUTPUT
-
-TOP RETRIEVED EVIDENCE:
-1. authentication.md | NetRC authentication (chunk_id=data_raw_httpx_advanced_authentication_chunk_003, distance=0.7308)
-2. authentication.md | Introduction (chunk_id=data_raw_httpx_advanced_authentication_chunk_000, distance=0.7662)
-3. quickstart.md | Authentication (chunk_id=data_raw_httpx_quickstart_chunk_017, distance=0.7681)
-
-EVIDENCE-BASED SUMMARY:
-- [authentication.md | NetRC authentication] HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.  The `.netrc` config file allows authentication credentials to be associated with specified hosts....
-- [authentication.md | Introduction] Authentication can either be included on a per-request basis...  ```pycon >>> auth = httpx.BasicAuth(username="username", password="secret") >>> client = httpx.Client() >>> response = client.get("https://www.example.com/...
-- [quickstart.md | Authentication] HTTPX supports Basic and Digest HTTP authentication.  To provide Basic authentication credentials, pass a 2-tuple of plaintext `str` or `bytes` objects as the `auth` argument to the request functions:  ```pycon >>> httpx...
-
-SOURCES:
-- authentication.md | NetRC authentication
-- authentication.md | Introduction
-- quickstart.md | Authentication
-
-----------------------------------------------------------------------------------------------------
-RAW TOP CHUNK:
-HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.
-
-The `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.
-
-Example `.netrc` file:
-
-```
-machine example.org
-login example-username
-password example-password
-
-machine python-httpx.org
-login other-username
-password other-password
-```
-
-Some examples of configuring `.netrc` authentication with `httpx`.
-
-Use the default `.netrc` file in the users home directory:
-
-```pycon
->>> auth = httpx.NetRCAuth()
->>> client = httpx.Client(auth=auth)
-```
-
-Use an explicit path to a `.netrc` file:
-
-```pycon
->>> auth = httpx.NetRCAuth(file="/path/to/.netrc")
->>> client = httpx.Client(auth=auth)
-```
-
-Use the `NETRC` environment variable to configure a path to the `.netrc` file,
-or fallback to the default.
-
-```pycon
->>> auth = httpx.NetRCAuth(file=os.environ.get("NETRC"))
->>> client = httpx.Client(auth=auth)
-```
-
-The `NetRCAuth()` class uses [the `netrc.netrc()` function from the Python standard library](https://docs.python.org/3/library/netrc.html). See the documentation there for more details on exceptions that may be raised if the `.netrc` file is not found, or cannot be parsed.
