@@ -1,0 +1,10 @@
+question,question_type,variant,variant_name,expected_source,expected_keywords,source_match,keyword_match,abstained,latency_ms,num_results,error
+How do I configure authentication in HTTPX?,in_domain,B,dense_abstention,quickstart.md,"auth,Basic,Digest",1,1,0,1915.9398078918457,5,
+What authentication methods does HTTPX support?,in_domain,A,dense_baseline,authentication.md,"Basic,Digest,authentication",1,1,0,20.743846893310547,5,
+What is DigestAuth?,in_domain,A,dense_baseline,authentication.md,"DigestAuth,Digest,auth",1,1,0,19.479990005493164,5,
+How do I use NetRCAuth?,in_domain,A,dense_baseline,authentication.md,"NetRCAuth,netrc,authentication",1,1,0,8.606910705566406,5,
+How do timeouts work in HTTPX?,in_domain,B,dense_abstention,timeouts.md,"timeout,connect,read,write,pool",1,1,0,19.632816314697266,5,
+How do I configure SSL certificates?,in_domain,B,dense_abstention,ssl.md,"SSL,certificate,verify",1,1,0,20.773887634277344,5,
+How do I fine-tune a BERT model?,out_of_domain,B,dense_abstention,,,0,0,1,19.839048385620117,0,
+What is the capital of France?,out_of_domain,A,dense_baseline,,,0,0,0,19.757986068725586,5,
+How do I train a neural network from scratch?,out_of_domain,A,dense_baseline,,,0,0,0,8.435964584350586,5,

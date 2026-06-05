@@ -1,0 +1,22 @@
+experiment_name: ask_my_docs_rag
+run_name: hybrid_rerank
+
+retriever:
+  type: hybrid
+  top_k: 5
+
+reranker:
+  enabled: true
+  model_name: cross-encoder/ms-marco-MiniLM-L-6-v2
+
+abstention:
+  enabled: true
+  threshold: 1.2
+
+data:
+  eval_file: data/eval/eval_questions.csv
+  chunks_file: data/processed/chunks.json
+
+output:
+  results_dir: experiments/results
+

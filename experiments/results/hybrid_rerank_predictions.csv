@@ -1,0 +1,10 @@
+question,question_type,expected_source,expected_keywords,source_match,keyword_match,abstained,latency_ms,num_results,error
+How do I configure authentication in HTTPX?,in_domain,quickstart.md,"auth,Basic,Digest",1,1,0,2458.444118499756,5,
+What authentication methods does HTTPX support?,in_domain,authentication.md,"Basic,Digest,authentication",1,1,0,109.97509956359863,5,
+What is DigestAuth?,in_domain,authentication.md,"DigestAuth,Digest,auth",1,1,0,68.75181198120117,5,
+How do I use NetRCAuth?,in_domain,authentication.md,"NetRCAuth,netrc,authentication",1,1,0,73.24028015136719,5,
+How do timeouts work in HTTPX?,in_domain,timeouts.md,"timeout,connect,read,write,pool",1,1,0,74.28717613220215,5,
+How do I configure SSL certificates?,in_domain,ssl.md,"SSL,certificate,verify",1,1,0,48.78687858581543,5,
+How do I fine-tune a BERT model?,out_of_domain,,,0,0,1,106.47702217102051,0,
+What is the capital of France?,out_of_domain,,,0,0,1,54.3210506439209,0,
+How do I train a neural network from scratch?,out_of_domain,,,0,0,1,47.920942306518555,0,

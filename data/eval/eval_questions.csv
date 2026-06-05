@@ -1,0 +1,10 @@
+question,expected_source,expected_keywords,question_type
+How do I configure authentication in HTTPX?,quickstart.md,"auth,Basic,Digest",in_domain
+What authentication methods does HTTPX support?,authentication.md,"Basic,Digest,authentication",in_domain
+What is DigestAuth?,authentication.md,"DigestAuth,Digest,auth",in_domain
+How do I use NetRCAuth?,authentication.md,"NetRCAuth,netrc,authentication",in_domain
+How do timeouts work in HTTPX?,timeouts.md,"timeout,connect,read,write,pool",in_domain
+How do I configure SSL certificates?,ssl.md,"SSL,certificate,verify",in_domain
+How do I fine-tune a BERT model?,,,"out_of_domain"
+What is the capital of France?,,,"out_of_domain"
+How do I train a neural network from scratch?,,,"out_of_domain"

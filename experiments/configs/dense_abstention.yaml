@@ -1,0 +1,20 @@
+experiment_name: ask_my_docs_rag
+run_name: dense_abstention
+
+retriever:
+  type: dense
+  top_k: 5
+
+reranker:
+  enabled: false
+
+abstention:
+  enabled: true
+  threshold: 1.2
+
+data:
+  eval_file: data/eval/eval_questions.csv
+  chunks_file: data/processed/chunks.json
+
+output:
+  results_dir: experiments/results

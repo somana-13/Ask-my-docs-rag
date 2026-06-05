@@ -1,0 +1,8 @@
+{
+  "source_match_rate": 1.0,
+  "keyword_match_rate": 1.0,
+  "avg_latency_ms": 244.7375456492106,
+  "avg_num_results": 5.0,
+  "out_of_domain_abstention_rate": 0.0,
+  "error_rate": 0.0
+}

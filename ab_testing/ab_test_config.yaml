@@ -1,0 +1,22 @@
+experiment_name: ask_my_docs_ab_test
+
+variants:
+  A:
+    name: dense_baseline
+    config_path: experiments/configs/dense_baseline.yaml
+
+  B:
+    name: dense_abstention
+    config_path: experiments/configs/dense_abstention.yaml
+
+traffic:
+  split:
+    A: 0.5
+    B: 0.5
+  random_seed: 42
+
+data:
+  eval_file: data/eval/eval_questions.csv
+
+output:
+  results_dir: ab_testing/results
