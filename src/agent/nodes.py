@@ -56,16 +56,24 @@ def router_node(state: AgentState) -> AgentState:
     }
 
     unsupported_topic_markers = [
-        "aws",
-        "lambda",
-        "kubernetes",
+        # intentionally removed for CI demo: "aws",
+        # intentionally removed for CI demo: "lambda",
+        # intentionally removed for CI demo: "kubernetes",
         "docker",
-        "deploy",
+        # intentionally removed for CI demo: "deploy",
         "deployment",
         "terraform",
         "ec2",
         "s3",
         "cloud",
+        "bert",
+        "fine",
+        "finetune",
+        "fine-tune",
+        "fine-tuning",
+        "train",
+        "training",
+        "model",
     ]
 
     if any(marker in query_normalized.split() for marker in unsupported_topic_markers):
@@ -141,28 +149,71 @@ def decompose_node(state: AgentState) -> AgentState:
     """
     Break a multi-hop query into smaller retrieval-friendly sub-questions.
 
-    This starts as deterministic decomposition so the behavior is easy to test.
-    Later, this can be replaced with an LLM-based decomposer.
+    This deterministic decomposer maps HTTPX topic keywords to focused
+    sub-questions so multi-hop retrieval covers each required source.
     """
     query = state["query"].strip()
     query_lower = query.lower()
 
+    topic_rules = [
+        (
+            ["authentication", "auth", "basic authentication", "digest authentication"],
+            "How do I configure authentication in HTTPX?",
+        ),
+        (
+            ["timeout", "timeouts"],
+            "How do I configure timeouts in HTTPX?",
+        ),
+        (
+            ["ssl", "certificate", "certificates", "certificate verification"],
+            "How do I configure SSL certificates in HTTPX?",
+        ),
+        (
+            ["redirect", "redirects"],
+            "How do redirects work in HTTPX?",
+        ),
+        (
+            ["client", "clients", "connection settings", "sync clients"],
+            "How do I use clients in HTTPX?",
+        ),
+        (
+            ["async", "async requests", "async clients"],
+            "How do I use async support in HTTPX?",
+        ),
+        (
+            ["proxy", "proxies"],
+            "How do proxies work in HTTPX?",
+        ),
+        (
+            ["transport", "transports"],
+            "How do transports work in HTTPX?",
+        ),
+        (
+            ["exception", "exceptions", "error", "errors"],
+            "How do exceptions work in HTTPX?",
+        ),
+        (
+            ["environment variable", "environment variables", "ssl_cert_file", "ssl_cert_dir"],
+            "How do environment variables work in HTTPX?",
+        ),
+    ]
+
     sub_questions: list[str] = []
+    seen = set()
 
-    if "authentication" in query_lower or "auth" in query_lower:
-        sub_questions.append("How do I configure authentication in HTTPX?")
+    for keywords, sub_question in topic_rules:
+        if any(keyword in query_lower for keyword in keywords):
+            if sub_question not in seen:
+                sub_questions.append(sub_question)
+                seen.add(sub_question)
 
-    if "timeout" in query_lower or "timeouts" in query_lower:
-        sub_questions.append("How do I configure timeouts in HTTPX?")
-
-    if "ssl" in query_lower or "certificate" in query_lower or "certificates" in query_lower:
-        sub_questions.append("How do I configure SSL certificates in HTTPX?")
-
-    if "redirect" in query_lower or "redirects" in query_lower:
-        sub_questions.append("How do redirects work in HTTPX?")
-
+    # Fallback: split explicit conjunction/comparison queries.
     if not sub_questions:
-        parts = re.split(r"\band\b|\bboth\b|,", query, flags=re.IGNORECASE)
+        parts = re.split(
+            r"\band\b|\bboth\b|\bcompare\b|\bdifference between\b|,",
+            query,
+            flags=re.IGNORECASE,
+        )
         sub_questions = [part.strip() for part in parts if len(part.strip().split()) >= 3]
 
     if len(sub_questions) < 2:
