@@ -1,0 +1,46 @@
+name: Agentic RAG Eval
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install langgraph langchain-core sentence-transformers scikit-learn torch
+
+      - name: Run syntax checks
+        run: |
+          python -m py_compile \
+            src/agent/state.py \
+            src/agent/nodes.py \
+            src/agent/graph.py \
+            src/agent/run_agent.py \
+            eval/claim_extractor.py \
+            eval/nli_faithfulness.py \
+            eval/metrics.py \
+            eval/run_eval.py \
+            eval/ci_gate.py
+
+      - name: Run Agentic RAG CI eval gate
+        run: |
+          python -m eval.ci_gate \
+            --dataset eval/ci_smoke_set.json \
+            --output reports/ci_eval_results.json \
+            --faithfulness-threshold 0.80
