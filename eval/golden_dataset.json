@@ -1,0 +1,99 @@
+[
+  {
+    "id": "simple_001",
+    "question": "How do I configure authentication in HTTPX?",
+    "question_type": "simple_lookup",
+    "expected_route": "simple_search",
+    "expected_sources": [
+      "authentication.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "simple_002",
+    "question": "What authentication methods does HTTPX support?",
+    "question_type": "simple_lookup",
+    "expected_route": "simple_search",
+    "expected_sources": [
+      "authentication.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "simple_003",
+    "question": "How do I configure timeouts in HTTPX?",
+    "question_type": "simple_lookup",
+    "expected_route": "simple_search",
+    "expected_sources": [
+      "timeouts.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "simple_004",
+    "question": "How do I configure SSL certificates in HTTPX?",
+    "question_type": "simple_lookup",
+    "expected_route": "simple_search",
+    "expected_sources": [
+      "ssl.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multi_001",
+    "question": "How do I configure authentication and timeouts in HTTPX?",
+    "question_type": "multi_hop",
+    "expected_route": "decompose_multihop",
+    "expected_sources": [
+      "authentication.md",
+      "timeouts.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multi_002",
+    "question": "How do I configure SSL certificates and timeouts in HTTPX?",
+    "question_type": "multi_hop",
+    "expected_route": "decompose_multihop",
+    "expected_sources": [
+      "ssl.md",
+      "timeouts.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "multi_003",
+    "question": "Compare authentication and SSL configuration in HTTPX.",
+    "question_type": "comparison",
+    "expected_route": "decompose_multihop",
+    "expected_sources": [
+      "authentication.md",
+      "ssl.md"
+    ],
+    "answerable": true
+  },
+  {
+    "id": "clarify_001",
+    "question": "Explain",
+    "question_type": "clarification",
+    "expected_route": "clarify",
+    "expected_sources": [],
+    "answerable": false
+  },
+  {
+    "id": "clarify_002",
+    "question": "How does it work?",
+    "question_type": "clarification",
+    "expected_route": "clarify",
+    "expected_sources": [],
+    "answerable": false
+  },
+  {
+    "id": "unanswerable_001",
+    "question": "How do I deploy HTTPX on AWS Lambda with Kubernetes?",
+    "question_type": "unanswerable",
+    "expected_route": "clarify",
+    "expected_sources": [],
+    "answerable": false
+  }
+]

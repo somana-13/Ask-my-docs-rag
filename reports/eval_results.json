@@ -1,0 +1,654 @@
+{
+  "summary": {
+    "num_examples": 10,
+    "router_accuracy": 1.0,
+    "retrieval_precision_at_5": 1.0,
+    "citation_coverage": 1.0,
+    "abstention_accuracy": 1.0,
+    "faithfulness_score": 0.95,
+    "avg_latency_ms": 175.57488740421832
+  },
+  "results": [
+    {
+      "id": "simple_001",
+      "question": "How do I configure authentication in HTTPX?",
+      "question_type": "simple_lookup",
+      "expected_route": "simple_search",
+      "actual_route": "simple_search",
+      "answerable": true,
+      "expected_sources": [
+        "authentication.md"
+      ],
+      "retrieved_sources": [
+        "- authentication.md | NetRC authentication",
+        "- authentication.md | Introduction",
+        "- quickstart.md | Authentication"
+      ],
+      "citations": [
+        "authentication.md | NetRC authentication",
+        "authentication.md | Introduction",
+        "quickstart.md | Authentication"
+      ],
+      "sub_questions": [],
+      "answer": "Based on the retrieved documentation, here is the most relevant evidence:\n\n- HTTPX can be configured to use a `.netrc` config file for authentication. The `.netrc` config file allows authentication credentials to be associated with specified hosts.\n- HTTPX supports Basic and Digest HTTP authentication. To provide Basic authentication credentials, pass a 2-tuple of plaintext `str` or `bytes` objects as the `auth` argument to the request functions: To provide credentials for Digest authentication you'll need to instantiate a `DigestAuth` object with the plaintext username and password as arguments.",
+      "latency_ms": 1630.4953749640845,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 4,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "HTTPX can be configured to use a `.netrc` config file for authentication.",
+            "entailment_score": 0.996631665573211,
+            "contradiction_score": 0.000580283037467593,
+            "neutral_score": 0.0027880513893214593,
+            "best_source": "authentication.md",
+            "best_section": "NetRC authentication",
+            "best_evidence": "HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.\n\nThe `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.\n\nExample `.netrc` file:\n\n```\nmachine example.org\nlogin example-username\npassword example-password\n\nmachine python-httpx.org\nlogin other-us",
+            "verdict": "supported"
+          },
+          {
+            "claim": "The `.netrc` config file allows authentication credentials to be associated with specified hosts.",
+            "entailment_score": 0.9610594832871429,
+            "contradiction_score": 0.0093152582198392,
+            "neutral_score": 0.029625258493018048,
+            "best_source": "authentication.md",
+            "best_section": "NetRC authentication",
+            "best_evidence": "HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.\n\nThe `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.\n\nExample `.netrc` file:\n\n```\nmachine example.org\nlogin example-username\npassword example-password\n\nmachine python-httpx.org\nlogin other-us",
+            "verdict": "supported"
+          },
+          {
+            "claim": "HTTPX supports Basic and Digest HTTP authentication.",
+            "entailment_score": 0.9975165924199688,
+            "contradiction_score": 0.00010720385682427289,
+            "neutral_score": 0.0023762037232069014,
+            "best_source": "quickstart.md",
+            "best_section": "Authentication",
+            "best_evidence": "HTTPX supports Basic and Digest HTTP authentication.\n\nTo provide Basic authentication credentials, pass a 2-tuple of\nplaintext `str` or `bytes` objects as the `auth` argument to the request\nfunctions:\n\n```pycon\n>>> httpx.get(\"https://example.com\", auth=(\"my_user\", \"password123\"))\n```\n\nTo provide credentials for Digest authentication you'll need to instantiate\na `DigestAuth` object with the plaintext username and password as arguments.\nThis object can be then passed as the `auth` argument to the ",
+            "verdict": "supported"
+          },
+          {
+            "claim": "To provide Basic authentication credentials, pass a 2-tuple of plaintext `str` or `bytes` objects as the `auth` argument to the request functions: To provide credentials for Digest authentication you'll need to instantiate a `DigestAuth` object with the plaintext username and password as arguments.",
+            "entailment_score": 0.9970096709044315,
+            "contradiction_score": 0.0001875669111131993,
+            "neutral_score": 0.0028027621844552166,
+            "best_source": "quickstart.md",
+            "best_section": "Authentication",
+            "best_evidence": "HTTPX supports Basic and Digest HTTP authentication.\n\nTo provide Basic authentication credentials, pass a 2-tuple of\nplaintext `str` or `bytes` objects as the `auth` argument to the request\nfunctions:\n\n```pycon\n>>> httpx.get(\"https://example.com\", auth=(\"my_user\", \"password123\"))\n```\n\nTo provide credentials for Digest authentication you'll need to instantiate\na `DigestAuth` object with the plaintext username and password as arguments.\nThis object can be then passed as the `auth` argument to the ",
+            "verdict": "supported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "simple_002",
+      "question": "What authentication methods does HTTPX support?",
+      "question_type": "simple_lookup",
+      "expected_route": "simple_search",
+      "actual_route": "simple_search",
+      "answerable": true,
+      "expected_sources": [
+        "authentication.md"
+      ],
+      "retrieved_sources": [
+        "- authentication.md | Custom authentication schemes"
+      ],
+      "citations": [
+        "authentication.md | Custom authentication schemes"
+      ],
+      "sub_questions": [],
+      "answer": "Based on the retrieved documentation, here is the most relevant evidence:\n\n- When issuing requests or instantiating a client, the `auth` argument can be used to pass an authentication scheme to use. A two-tuple of `username`/`password`, to be used with basic authentication.",
+      "latency_ms": 38.506084005348384,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 0.5,
+      "faithfulness": {
+        "faithfulness_score": 0.5,
+        "num_claims": 2,
+        "supported_claims": 1,
+        "unsupported_claims": 1,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "When issuing requests or instantiating a client, the `auth` argument can be used to pass an authentication scheme to use.",
+            "entailment_score": 0.9140264449890676,
+            "contradiction_score": 0.00019859984065140698,
+            "neutral_score": 0.08577495517028097,
+            "best_source": "authentication.md",
+            "best_section": "Custom authentication schemes",
+            "best_evidence": "When issuing requests or instantiating a client, the `auth` argument can be used to pass an authentication scheme to use. The `auth` argument may be one of the following...\n\n* A two-tuple of `username`/`password`, to be used with basic authentication.\n* An instance of `httpx.BasicAuth()`, `httpx.DigestAuth()`, or `httpx.NetRCAuth()`.\n* A callable, accepting a request and returning an authenticated request instance.\n* An instance of subclasses of `httpx.Auth`.\n\nThe most involved of these is the l",
+            "verdict": "supported"
+          },
+          {
+            "claim": "A two-tuple of `username`/`password`, to be used with basic authentication.",
+            "entailment_score": 0.0019734806979591775,
+            "contradiction_score": 0.0010486964643812839,
+            "neutral_score": 0.9969778228376595,
+            "best_source": "authentication.md",
+            "best_section": "Custom authentication schemes",
+            "best_evidence": "When issuing requests or instantiating a client, the `auth` argument can be used to pass an authentication scheme to use. The `auth` argument may be one of the following...\n\n* A two-tuple of `username`/`password`, to be used with basic authentication.\n* An instance of `httpx.BasicAuth()`, `httpx.DigestAuth()`, or `httpx.NetRCAuth()`.\n* A callable, accepting a request and returning an authenticated request instance.\n* An instance of subclasses of `httpx.Auth`.\n\nThe most involved of these is the l",
+            "verdict": "unsupported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "simple_003",
+      "question": "How do I configure timeouts in HTTPX?",
+      "question_type": "simple_lookup",
+      "expected_route": "simple_search",
+      "actual_route": "simple_search",
+      "answerable": true,
+      "expected_sources": [
+        "timeouts.md"
+      ],
+      "retrieved_sources": [
+        "- timeouts.md | Introduction",
+        "- timeouts.md | Fine tuning the configuration",
+        "- timeouts.md | A client with a 60s timeout for connecting, and a 10s timeout elsewhere."
+      ],
+      "citations": [
+        "timeouts.md | Introduction",
+        "timeouts.md | Fine tuning the configuration",
+        "timeouts.md | A client with a 60s timeout for connecting, and a 10s timeout elsewhere."
+      ],
+      "sub_questions": [],
+      "answer": "Based on the retrieved documentation, here is the most relevant evidence:\n\n- HTTPX is careful to enforce timeouts everywhere by default. The default behavior is to raise a `TimeoutException` after 5 seconds of network inactivity.\n- HTTPX also allows you to specify the timeout behavior in more fine grained detail. There are four different types of timeouts that may occur.\n- timeout = httpx.Timeout(10.0, connect=60.0) client = httpx.Client(timeout=timeout) response = client.get('http://example.com/') ```",
+      "latency_ms": 23.288458003662527,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 5,
+        "supported_claims": 5,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "HTTPX is careful to enforce timeouts everywhere by default.",
+            "entailment_score": 0.997008107544514,
+            "contradiction_score": 3.6049435147085296e-05,
+            "neutral_score": 0.0029558430203389255,
+            "best_source": "timeouts.md",
+            "best_section": "Introduction",
+            "best_evidence": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.",
+            "verdict": "supported"
+          },
+          {
+            "claim": "The default behavior is to raise a `TimeoutException` after 5 seconds of network inactivity.",
+            "entailment_score": 0.9961373536866378,
+            "contradiction_score": 0.00020789327737519102,
+            "neutral_score": 0.0036547530359868265,
+            "best_source": "timeouts.md",
+            "best_section": "Introduction",
+            "best_evidence": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.",
+            "verdict": "supported"
+          },
+          {
+            "claim": "HTTPX also allows you to specify the timeout behavior in more fine grained detail.",
+            "entailment_score": 0.9925179994760007,
+            "contradiction_score": 0.00011297391803625917,
+            "neutral_score": 0.0073690266059629455,
+            "best_source": "timeouts.md",
+            "best_section": "Fine tuning the configuration",
+            "best_evidence": "HTTPX also allows you to specify the timeout behavior in more fine grained detail.\n\nThere are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established. If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.\n* The **read** timeout specifies the maximum duration to wai",
+            "verdict": "supported"
+          },
+          {
+            "claim": "There are four different types of timeouts that may occur.",
+            "entailment_score": 0.980803676655083,
+            "contradiction_score": 9.97643251806884e-05,
+            "neutral_score": 0.0190965590197365,
+            "best_source": "timeouts.md",
+            "best_section": "Fine tuning the configuration",
+            "best_evidence": "HTTPX also allows you to specify the timeout behavior in more fine grained detail.\n\nThere are four different types of timeouts that may occur. These are **connect**,\n**read**, **write**, and **pool** timeouts.\n\n* The **connect** timeout specifies the maximum amount of time to wait until\na socket connection to the requested host is established. If HTTPX is unable to connect\nwithin this time frame, a `ConnectTimeout` exception is raised.\n* The **read** timeout specifies the maximum duration to wai",
+            "verdict": "supported"
+          },
+          {
+            "claim": "timeout = httpx.Timeout(10.0, connect=60.0) client = httpx.Client(timeout=timeout) response = client.get('http://example.com/') ```",
+            "entailment_score": 0.9837204418399088,
+            "contradiction_score": 0.0027968777983401532,
+            "neutral_score": 0.013482680361751005,
+            "best_source": "timeouts.md",
+            "best_section": "A client with a 60s timeout for connecting, and a 10s timeout elsewhere.",
+            "best_evidence": "timeout = httpx.Timeout(10.0, connect=60.0)\nclient = httpx.Client(timeout=timeout)\n\nresponse = client.get('http://example.com/')\n```",
+            "verdict": "supported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "simple_004",
+      "question": "How do I configure SSL certificates in HTTPX?",
+      "question_type": "simple_lookup",
+      "expected_route": "simple_search",
+      "actual_route": "simple_search",
+      "answerable": true,
+      "expected_sources": [
+        "ssl.md"
+      ],
+      "retrieved_sources": [
+        "- ssl.md | Introduction",
+        "- ssl.md | Use an explicitly configured certificate store.",
+        "- ssl.md | Working with `SSL_CERT_FILE` and `SSL_CERT_DIR`"
+      ],
+      "citations": [
+        "ssl.md | Introduction",
+        "ssl.md | Use an explicitly configured certificate store.",
+        "ssl.md | Working with `SSL_CERT_FILE` and `SSL_CERT_DIR`"
+      ],
+      "sub_questions": [],
+      "answer": "Based on the retrieved documentation, here is the most relevant evidence:\n\n- When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. CA bundle) delivered by a trusted certificate authority (CA).\n- ctx = ssl.create_default_context(cafile=\"path/to/certs.pem\") # Either cafile or capath.\n- `httpx` does respect the `SSL_CERT_FILE` and `SSL_CERT_DIR` environment variables by default. For details, refer to the section on the environment variables page.",
+      "latency_ms": 22.408583026845008,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 5,
+        "supported_claims": 5,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host.",
+            "entailment_score": 0.9944542808198752,
+            "contradiction_score": 0.00011008391404146991,
+            "neutral_score": 0.0054356352660834256,
+            "best_source": "ssl.md",
+            "best_section": "Introduction",
+            "best_evidence": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. To do this, it uses a bundle of SSL certificates (a.k.a. CA bundle) delivered by a trusted certificate authority (CA).",
+            "verdict": "supported"
+          },
+          {
+            "claim": "CA bundle) delivered by a trusted certificate authority (CA).",
+            "entailment_score": 0.989189802969673,
+            "contradiction_score": 0.0007788851776887309,
+            "neutral_score": 0.010031311852638388,
+            "best_source": "ssl.md",
+            "best_section": "Introduction",
+            "best_evidence": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. To do this, it uses a bundle of SSL certificates (a.k.a. CA bundle) delivered by a trusted certificate authority (CA).",
+            "verdict": "supported"
+          },
+          {
+            "claim": "ctx = ssl.create_default_context(cafile=\"path/to/certs.pem\") # Either cafile or capath.",
+            "entailment_score": 0.9871762792417319,
+            "contradiction_score": 0.001466654508219281,
+            "neutral_score": 0.011357066250048845,
+            "best_source": "ssl.md",
+            "best_section": "Use an explicitly configured certificate store.",
+            "best_evidence": "ctx = ssl.create_default_context(cafile=\"path/to/certs.pem\")  # Either cafile or capath.\nclient = httpx.Client(verify=ctx)\n```",
+            "verdict": "supported"
+          },
+          {
+            "claim": "`httpx` does respect the `SSL_CERT_FILE` and `SSL_CERT_DIR` environment variables by default.",
+            "entailment_score": 0.9968998671557958,
+            "contradiction_score": 6.246029311135432e-05,
+            "neutral_score": 0.003037672551092847,
+            "best_source": "ssl.md",
+            "best_section": "Working with `SSL_CERT_FILE` and `SSL_CERT_DIR`",
+            "best_evidence": "`httpx` does respect the `SSL_CERT_FILE` and `SSL_CERT_DIR` environment variables by default. For details, refer to [the section on the environment variables page](../environment_variables.md#ssl_cert_file).",
+            "verdict": "supported"
+          },
+          {
+            "claim": "For details, refer to the section on the environment variables page.",
+            "entailment_score": 0.9883135607542451,
+            "contradiction_score": 0.0010697917281629282,
+            "neutral_score": 0.010616647517591936,
+            "best_source": "ssl.md",
+            "best_section": "Working with `SSL_CERT_FILE` and `SSL_CERT_DIR`",
+            "best_evidence": "`httpx` does respect the `SSL_CERT_FILE` and `SSL_CERT_DIR` environment variables by default. For details, refer to [the section on the environment variables page](../environment_variables.md#ssl_cert_file).",
+            "verdict": "supported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi_001",
+      "question": "How do I configure authentication and timeouts in HTTPX?",
+      "question_type": "multi_hop",
+      "expected_route": "decompose_multihop",
+      "actual_route": "decompose_multihop",
+      "answerable": true,
+      "expected_sources": [
+        "authentication.md",
+        "timeouts.md"
+      ],
+      "retrieved_sources": [
+        "- authentication.md | NetRC authentication",
+        "- authentication.md | Introduction",
+        "- quickstart.md | Authentication",
+        "- timeouts.md | Introduction",
+        "- timeouts.md | Fine tuning the configuration",
+        "- timeouts.md | A client with a 60s timeout for connecting, and a 10s timeout elsewhere."
+      ],
+      "citations": [
+        "authentication.md | NetRC authentication",
+        "timeouts.md | Introduction"
+      ],
+      "sub_questions": [
+        "How do I configure authentication in HTTPX?",
+        "How do I configure timeouts in HTTPX?"
+      ],
+      "answer": "This question requires evidence from multiple parts of the documentation.\n\nFor 'How do I configure authentication in HTTPX?', the relevant documentation says: HTTPX can be configured to use a `.netrc` config file for authentication. The `.netrc` config file allows authentication credentials to be associated with specified hosts.\n\nFor 'How do I configure timeouts in HTTPX?', the relevant documentation says: HTTPX is careful to enforce timeouts everywhere by default. The default behavior is to raise a `TimeoutException` after 5 seconds of network inactivity.",
+      "latency_ms": 15.015166951343417,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 4,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "HTTPX can be configured to use a `.netrc` config file for authentication.",
+            "entailment_score": 0.996631665573211,
+            "contradiction_score": 0.000580283037467593,
+            "neutral_score": 0.0027880513893214593,
+            "best_source": "authentication.md",
+            "best_section": "NetRC authentication",
+            "best_evidence": "HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.\n\nThe `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.\n\nExample `.netrc` file:\n\n```\nmachine example.org\nlogin example-username\npassword example-password\n\nmachine python-httpx.org\nlogin other-us",
+            "verdict": "supported"
+          },
+          {
+            "claim": "The `.netrc` config file allows authentication credentials to be associated with specified hosts.",
+            "entailment_score": 0.9610594832871429,
+            "contradiction_score": 0.0093152582198392,
+            "neutral_score": 0.029625258493018048,
+            "best_source": "authentication.md",
+            "best_section": "NetRC authentication",
+            "best_evidence": "HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.\n\nThe `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.\n\nExample `.netrc` file:\n\n```\nmachine example.org\nlogin example-username\npassword example-password\n\nmachine python-httpx.org\nlogin other-us",
+            "verdict": "supported"
+          },
+          {
+            "claim": "HTTPX is careful to enforce timeouts everywhere by default.",
+            "entailment_score": 0.997008107544514,
+            "contradiction_score": 3.6049435147085296e-05,
+            "neutral_score": 0.0029558430203389255,
+            "best_source": "timeouts.md",
+            "best_section": "Introduction",
+            "best_evidence": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.",
+            "verdict": "supported"
+          },
+          {
+            "claim": "The default behavior is to raise a `TimeoutException` after 5 seconds of network inactivity.",
+            "entailment_score": 0.9961373536866378,
+            "contradiction_score": 0.00020789327737519102,
+            "neutral_score": 0.0036547530359868265,
+            "best_source": "timeouts.md",
+            "best_section": "Introduction",
+            "best_evidence": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.",
+            "verdict": "supported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi_002",
+      "question": "How do I configure SSL certificates and timeouts in HTTPX?",
+      "question_type": "multi_hop",
+      "expected_route": "decompose_multihop",
+      "actual_route": "decompose_multihop",
+      "answerable": true,
+      "expected_sources": [
+        "ssl.md",
+        "timeouts.md"
+      ],
+      "retrieved_sources": [
+        "- timeouts.md | Introduction",
+        "- timeouts.md | Fine tuning the configuration",
+        "- timeouts.md | A client with a 60s timeout for connecting, and a 10s timeout elsewhere.",
+        "- ssl.md | Introduction",
+        "- ssl.md | Use an explicitly configured certificate store.",
+        "- ssl.md | Working with `SSL_CERT_FILE` and `SSL_CERT_DIR`"
+      ],
+      "citations": [
+        "timeouts.md | Introduction",
+        "ssl.md | Introduction"
+      ],
+      "sub_questions": [
+        "How do I configure timeouts in HTTPX?",
+        "How do I configure SSL certificates in HTTPX?"
+      ],
+      "answer": "This question requires evidence from multiple parts of the documentation.\n\nFor 'How do I configure timeouts in HTTPX?', the relevant documentation says: HTTPX is careful to enforce timeouts everywhere by default. The default behavior is to raise a `TimeoutException` after 5 seconds of network inactivity.\n\nFor 'How do I configure SSL certificates in HTTPX?', the relevant documentation says: When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. CA bundle) delivered by a trusted certificate authority (CA).",
+      "latency_ms": 12.307083001360297,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 4,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "HTTPX is careful to enforce timeouts everywhere by default.",
+            "entailment_score": 0.997008107544514,
+            "contradiction_score": 3.6049435147085296e-05,
+            "neutral_score": 0.0029558430203389255,
+            "best_source": "timeouts.md",
+            "best_section": "Introduction",
+            "best_evidence": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.",
+            "verdict": "supported"
+          },
+          {
+            "claim": "The default behavior is to raise a `TimeoutException` after 5 seconds of network inactivity.",
+            "entailment_score": 0.9961373536866378,
+            "contradiction_score": 0.00020789327737519102,
+            "neutral_score": 0.0036547530359868265,
+            "best_source": "timeouts.md",
+            "best_section": "Introduction",
+            "best_evidence": "HTTPX is careful to enforce timeouts everywhere by default.\n\nThe default behavior is to raise a `TimeoutException` after 5 seconds of\nnetwork inactivity.",
+            "verdict": "supported"
+          },
+          {
+            "claim": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host.",
+            "entailment_score": 0.994454285487169,
+            "contradiction_score": 0.00011008375708193882,
+            "neutral_score": 0.0054356307557489525,
+            "best_source": "ssl.md",
+            "best_section": "Introduction",
+            "best_evidence": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. To do this, it uses a bundle of SSL certificates (a.k.a. CA bundle) delivered by a trusted certificate authority (CA).",
+            "verdict": "supported"
+          },
+          {
+            "claim": "CA bundle) delivered by a trusted certificate authority (CA).",
+            "entailment_score": 0.9891897890978307,
+            "contradiction_score": 0.0007788896235955075,
+            "neutral_score": 0.010031321278573806,
+            "best_source": "ssl.md",
+            "best_section": "Introduction",
+            "best_evidence": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. To do this, it uses a bundle of SSL certificates (a.k.a. CA bundle) delivered by a trusted certificate authority (CA).",
+            "verdict": "supported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "multi_003",
+      "question": "Compare authentication and SSL configuration in HTTPX.",
+      "question_type": "comparison",
+      "expected_route": "decompose_multihop",
+      "actual_route": "decompose_multihop",
+      "answerable": true,
+      "expected_sources": [
+        "authentication.md",
+        "ssl.md"
+      ],
+      "retrieved_sources": [
+        "- authentication.md | NetRC authentication",
+        "- authentication.md | Introduction",
+        "- quickstart.md | Authentication",
+        "- ssl.md | Introduction",
+        "- ssl.md | Use an explicitly configured certificate store.",
+        "- ssl.md | Working with `SSL_CERT_FILE` and `SSL_CERT_DIR`"
+      ],
+      "citations": [
+        "authentication.md | NetRC authentication",
+        "ssl.md | Introduction"
+      ],
+      "sub_questions": [
+        "How do I configure authentication in HTTPX?",
+        "How do I configure SSL certificates in HTTPX?"
+      ],
+      "answer": "This question requires evidence from multiple parts of the documentation.\n\nFor 'How do I configure authentication in HTTPX?', the relevant documentation says: HTTPX can be configured to use a `.netrc` config file for authentication. The `.netrc` config file allows authentication credentials to be associated with specified hosts.\n\nFor 'How do I configure SSL certificates in HTTPX?', the relevant documentation says: When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. CA bundle) delivered by a trusted certificate authority (CA).",
+      "latency_ms": 12.450542009901255,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 4,
+        "supported_claims": 4,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": [
+          {
+            "claim": "HTTPX can be configured to use a `.netrc` config file for authentication.",
+            "entailment_score": 0.996631665573211,
+            "contradiction_score": 0.000580283037467593,
+            "neutral_score": 0.0027880513893214593,
+            "best_source": "authentication.md",
+            "best_section": "NetRC authentication",
+            "best_evidence": "HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.\n\nThe `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.\n\nExample `.netrc` file:\n\n```\nmachine example.org\nlogin example-username\npassword example-password\n\nmachine python-httpx.org\nlogin other-us",
+            "verdict": "supported"
+          },
+          {
+            "claim": "The `.netrc` config file allows authentication credentials to be associated with specified hosts.",
+            "entailment_score": 0.9610594832871429,
+            "contradiction_score": 0.0093152582198392,
+            "neutral_score": 0.029625258493018048,
+            "best_source": "authentication.md",
+            "best_section": "NetRC authentication",
+            "best_evidence": "HTTPX can be configured to use [a `.netrc` config file](https://everything.curl.dev/usingcurl/netrc) for authentication.\n\nThe `.netrc` config file allows authentication credentials to be associated with specified hosts. When a request is made to a host that is found in the netrc file, the username and password will be included using HTTP basic authentication.\n\nExample `.netrc` file:\n\n```\nmachine example.org\nlogin example-username\npassword example-password\n\nmachine python-httpx.org\nlogin other-us",
+            "verdict": "supported"
+          },
+          {
+            "claim": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host.",
+            "entailment_score": 0.994454285487169,
+            "contradiction_score": 0.00011008375708193882,
+            "neutral_score": 0.0054356307557489525,
+            "best_source": "ssl.md",
+            "best_section": "Introduction",
+            "best_evidence": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. To do this, it uses a bundle of SSL certificates (a.k.a. CA bundle) delivered by a trusted certificate authority (CA).",
+            "verdict": "supported"
+          },
+          {
+            "claim": "CA bundle) delivered by a trusted certificate authority (CA).",
+            "entailment_score": 0.9891897890978307,
+            "contradiction_score": 0.0007788896235955075,
+            "neutral_score": 0.010031321278573806,
+            "best_source": "ssl.md",
+            "best_section": "Introduction",
+            "best_evidence": "When making a request over HTTPS, HTTPX needs to verify the identity of the requested host. To do this, it uses a bundle of SSL certificates (a.k.a. CA bundle) delivered by a trusted certificate authority (CA).",
+            "verdict": "supported"
+          }
+        ]
+      }
+    },
+    {
+      "id": "clarify_001",
+      "question": "Explain",
+      "question_type": "clarification",
+      "expected_route": "clarify",
+      "actual_route": "clarify",
+      "answerable": false,
+      "expected_sources": [],
+      "retrieved_sources": [],
+      "citations": [],
+      "sub_questions": [],
+      "answer": "Can you clarify what specific HTTPX topic you want to ask about?",
+      "latency_ms": 0.5908330203965306,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": []
+      }
+    },
+    {
+      "id": "clarify_002",
+      "question": "How does it work?",
+      "question_type": "clarification",
+      "expected_route": "clarify",
+      "actual_route": "clarify",
+      "answerable": false,
+      "expected_sources": [],
+      "retrieved_sources": [],
+      "citations": [],
+      "sub_questions": [],
+      "answer": "Can you clarify what specific HTTPX topic you want to ask about?",
+      "latency_ms": 0.3555410075932741,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": []
+      }
+    },
+    {
+      "id": "unanswerable_001",
+      "question": "How do I deploy HTTPX on AWS Lambda with Kubernetes?",
+      "question_type": "unanswerable",
+      "expected_route": "clarify",
+      "actual_route": "clarify",
+      "answerable": false,
+      "expected_sources": [],
+      "retrieved_sources": [],
+      "citations": [],
+      "sub_questions": [],
+      "answer": "I could not find this deployment/cloud topic in the indexed HTTPX documentation. Can you ask about authentication, timeouts, SSL, redirects, or another indexed HTTPX topic?",
+      "latency_ms": 0.33120805164799094,
+      "router_correct": true,
+      "retrieval_precision_at_5": 1.0,
+      "citation_coverage": 1.0,
+      "abstention_correct": true,
+      "faithfulness_score": 1.0,
+      "faithfulness": {
+        "faithfulness_score": 1.0,
+        "num_claims": 0,
+        "supported_claims": 0,
+        "unsupported_claims": 0,
+        "contradicted_claims": 0,
+        "claim_results": []
+      }
+    }
+  ]
+}
