@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS/editor
+.DS_Store
+.vscode/
+
+# MLflow local artifacts
+mlruns/
+mlflow.db
+
+# Runtime outputs
+reports/ci_eval_results.json
+runs/traces/
+
+# Accidental Chroma object-path folders
+<src.retrieval.vector_store.ChromaVectorStore object at *>/
