@@ -1,3 +1,5 @@
+from typing import Any
+
 from src.embeddings.embedder import LocalEmbedder
 from src.retrieval.vector_store import ChromaVectorStore
 
@@ -64,7 +66,8 @@ def format_evidence_summary(metadatas, max_points=3):
     return summary_points
 
 
-def run_query(query, embedder, vector_store):
+def run_retrieval(query: str, embedder: LocalEmbedder, vector_store: ChromaVectorStore) -> dict[str, Any]:
+    """Run dense retrieval and return structured evidence for downstream tools/agents."""
     query_embedding = embedder.embed_query(query)
     results = vector_store.query(query_embedding=query_embedding, n_results=MAX_RESULTS)
 
@@ -76,37 +79,62 @@ def run_query(query, embedder, vector_store):
     filtered = keep_relevant_results(ids, documents, metadatas, distances)
     filtered = diversify_results(filtered)
 
+    evidence = []
+    for chunk_id, doc, meta, dist in filtered[:MAX_DISPLAY]:
+        evidence.append(
+            {
+                "chunk_id": chunk_id,
+                "document": doc,
+                "metadata": meta,
+                "distance": dist,
+                "source_name": meta.get("source_name", "unknown"),
+                "section_title": meta.get("section_title", "unknown"),
+                "raw_text": meta.get("raw_text", doc or ""),
+            }
+        )
+
+    return {
+        "query": query,
+        "has_evidence": bool(evidence),
+        "evidence": evidence,
+        "sources": format_sources([item[2] for item in filtered[:MAX_DISPLAY]]),
+    }
+
+
+def run_query(query, embedder, vector_store):
+    retrieval_result = run_retrieval(query, embedder, vector_store)
+
     print("\n" + "=" * 100)
     print(f"QUESTION: {query}")
     print("=" * 100)
 
-    if not filtered:
+    if not retrieval_result["has_evidence"]:
         print("\nNo strong supporting evidence was found in the indexed documents.")
-        return
+        return retrieval_result
 
-    ids = [x[0] for x in filtered][:MAX_DISPLAY]
-    metadatas = [x[2] for x in filtered][:MAX_DISPLAY]
-    distances = [x[3] for x in filtered][:MAX_DISPLAY]
+    evidence = retrieval_result["evidence"]
 
     print("\nTOP RETRIEVED EVIDENCE:")
-    for i, (chunk_id, meta, dist) in enumerate(zip(ids, metadatas, distances), start=1):
+    for i, item in enumerate(evidence, start=1):
         print(
-            f"{i}. {meta.get('source_name')} | {meta.get('section_title')} "
-            f"(chunk_id={chunk_id}, distance={dist:.4f})"
+            f"{i}. {item['source_name']} | {item['section_title']} "
+            f"(chunk_id={item['chunk_id']}, distance={item['distance']:.4f})"
         )
 
     print("\nEVIDENCE-BASED SUMMARY:")
-    for point in format_evidence_summary(metadatas):
+    for point in format_evidence_summary([item["metadata"] for item in evidence]):
         print(point)
 
     print("\nSOURCES:")
-    for line in format_sources(metadatas):
+    for line in retrieval_result["sources"]:
         print(line)
 
     print("\n" + "-" * 100)
     print("RAW TOP CHUNK:")
-    print(metadatas[0].get("raw_text", "")[:1500])
+    print(evidence[0]["raw_text"][:1500])
     print("-" * 100)
+
+    return retrieval_result
 
 
 def main():
