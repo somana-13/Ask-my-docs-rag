@@ -12,8 +12,8 @@ The current corpus indexes a curated subset of the **HTTPX documentation** and a
 - Added BM25, hybrid retrieval, cross-encoder reranking, and evidence-based abstention.
 - Upgraded the fixed RAG pipeline into a **LangGraph agent** with conditional routing.
 - Added a **multi-hop decomposition path** for questions requiring evidence from multiple documentation sections.
-- Built a reproducible evaluation harness with router accuracy, retrieval precision@5, citation coverage, abstention accuracy, latency, and local NLI faithfulness.
-- Improved local NLI faithfulness from **0.7367 → 0.9500** after failure analysis and claim-extraction fixes.
+- Built a reproducible 30-question golden evaluation set covering simple lookup, how-to, multi-hop, comparison, clarification, and unanswerable queries.
+- Improved local NLI faithfulness from **0.7367 → 0.9306** after failure analysis, broader topic-aware decomposition, routing fixes, and claim-extraction cleanup.
 - Added a GitHub Actions CI gate that fails when quality metrics regress below thresholds.
 - Exposed the RAG pipeline through MCP tools for agent-compatible integration.
 
@@ -329,32 +329,34 @@ reports/eval_results.json
 
 ## Agentic RAG Evaluation Results
 
-Final evaluation on the initial 10-question golden set:
+Final evaluation on the expanded 30-question golden set:
 
 | Metric | Score |
 |---|---:|
 | Router accuracy | 1.0000 |
-| Retrieval precision@5 | 1.0000 |
-| Citation coverage | 1.0000 |
+| Retrieval precision@5 | 0.9667 |
+| Citation coverage | 0.9667 |
 | Abstention accuracy | 1.0000 |
-| Faithfulness score | 0.9500 |
-| Average latency | 175.57 ms |
+| Faithfulness score | 0.9306 |
+| Average latency | 57.11 ms |
 
-Improvement after failure analysis:
+Improvement from the initial baseline to the expanded eval:
 
-| Metric | Before | After |
+| Metric | Initial baseline | Expanded 30-question eval |
 |---|---:|---:|
 | Router accuracy | 0.8000 | 1.0000 |
-| Retrieval precision@5 | 0.9500 | 1.0000 |
-| Citation coverage | 0.8833 | 1.0000 |
+| Retrieval precision@5 | 0.9500 | 0.9667 |
+| Citation coverage | 0.8833 | 0.9667 |
 | Abstention accuracy | 0.8000 | 1.0000 |
-| Faithfulness score | 0.7367 | 0.9500 |
-| Average latency | 270.91 ms | 175.57 ms |
+| Faithfulness score | 0.7367 | 0.9306 |
+| Average latency | 270.91 ms | 57.11 ms |
 
 Key fixes:
 
 - Added punctuation-normalized routing for vague clarification queries.
 - Added out-of-corpus detection for cloud/deployment questions.
+- Expanded deterministic decomposition rules to cover clients, async support, proxies, transports, exceptions, and environment variables.
+- Expanded the evaluation set from 10 to 30 examples to reduce overfitting risk and better cover multi-hop/adversarial behavior.
 - Cleaned retrieved markdown before answer generation.
 - Improved claim extraction to remove answer-template prefixes before NLI scoring.
 - Removed incomplete markdown/list fragments from faithfulness evaluation.
@@ -395,6 +397,8 @@ It runs on pushes and pull requests to `main` and performs:
 2. syntax checks
 3. Agentic RAG CI smoke evaluation
 4. metric threshold validation
+
+The workflow was validated through a pull request run to confirm the CI gate executes end-to-end before merge.
 
 ---
 
