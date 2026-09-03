@@ -514,7 +514,20 @@ Start the MCP server:
 python -m mcp_server.server
 ```
 
-The server waits for an MCP client over stdio. This is expected behavior.
+Note the `-m` is required — running `python mcp_server/server.py` directly fails with `ModuleNotFoundError: No module named 'experiments'`, because the module's relative imports need the project root on the Python path, which `-m` provides automatically.
+
+The server runs over **streamable-http** transport, bound to `0.0.0.0:8000` — not stdio — so it's reachable over the network rather than only through a local subprocess pipe. This is what makes it deployable inside a container behind a load balancer (see [Deployment: AWS ECS Fargate](#deployment-aws-ecs-fargate) below). Verify it's up:
+
+```bash
+curl -i http://localhost:8000/health
+```
+
+Expected:
+
+```text
+HTTP/1.1 200 OK
+{"status":"ok"}
+```
 
 Test MCP tools directly:
 
@@ -546,6 +559,130 @@ Expected out-of-domain MCP response:
 ```bash
 python -m pytest -v
 ```
+
+---
+
+## Deployment: AWS ECS Fargate
+
+The MCP server is containerized and deployed to **AWS ECS on Fargate**, behind an **Application Load Balancer (ALB)**, to demonstrate the pipeline running as a real network service rather than only as a local process. No external LLM API keys are required — retrieval, reranking, and faithfulness scoring all run on local models (Sentence Transformers, ChromaDB, BM25, a local NLI cross-encoder), so the container carries no secrets.
+
+### Architecture
+
+```text
+Your machine                              AWS
+┌──────────────┐   docker push   ┌───────────────┐
+│ Docker image │ ──────────────► │ ECR            │
+│ (built here) │                 │ (image registry)│
+└──────────────┘                 └───────┬────────┘
+                                          │ pulled by
+                                          ▼
+Internet ──► ALB (port 80) ──► Target Group ──► ECS Task on Fargate (port 8000)
+             │                 (health check:        │
+             │                  GET /health)          │  FastMCP server
+             │                                         │  (streamable-http)
+   [ALB security group:                    [Task security group:
+    allow 80 from anywhere]                 allow 8000, only from
+                                             the ALB security group]
+```
+
+The task is never reachable directly from the internet — only the ALB's security group is allowed to reach the task's port 8000. This is enforced at the network layer (security group source rules), not just by convention.
+
+### Key design decisions
+
+| Decision | Why |
+|---|---|
+| CPU-only PyTorch build (`--index-url https://download.pytorch.org/whl/cpu`) | Default `pip install torch` pulls ~15 NVIDIA/CUDA packages meant for GPU training. Fargate has no GPUs — those packages are dead weight. This dropped the image from **9.84 GB to 3.26 GB**. |
+| Explicit `--platform linux/amd64` build | Fargate defaults to x86_64; the local dev machine is Apple Silicon (arm64). Images are architecture-specific — an arm64 image on Fargate fails immediately with an "exec format error." |
+| Custom `/health` route via FastMCP's `custom_route` decorator | The MCP protocol endpoint (`/mcp`) returns `406`/`400` for a plain unauthenticated `GET`, and there's no other route that returns `200`. An ALB health check needs a real `200` response or it kills and restarts the task in a loop, thinking it's broken. |
+| `requirements.txt` copied and installed before the rest of the source (`COPY requirements.txt .` before `COPY . .`) | Docker caches each Dockerfile instruction as a layer. Since `requirements.txt` changes far less often than application code, this ordering means a source-code edit doesn't force a multi-minute reinstall of torch/transformers/chromadb on every rebuild. |
+| Task security group only accepts port 8000 from the ALB's security group (not a CIDR range) | Identity-based, not IP-based — stays correct even if the ALB's underlying IP changes, and means the container is unreachable except through the load balancer. |
+| Separate IAM user (CLI access) vs. IAM role (`ecsTaskExecutionRole`) | The user is what a human authenticates as from the CLI; the role is what the ECS agent itself assumes to pull the image from ECR and ship logs to CloudWatch on the task's behalf. Scoped to only the four managed policies actually needed (ECR, ECS, ELB, and IAM for one-time role setup) rather than broad/root access. |
+
+### Dockerfile
+
+```dockerfile
+FROM python:3.13-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir torch==2.11.0 --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["python", "-m", "mcp_server.server"]
+```
+
+### Infrastructure summary
+
+| Resource | Purpose |
+|---|---|
+| ECR repository | Stores the built image (`<account>.dkr.ecr.us-east-1.amazonaws.com/ask-my-docs-rag`) |
+| ECS cluster | Logical grouping for the service |
+| Task definition | Blueprint: image, 1 vCPU / 3 GB memory, port 8000, execution role, CloudWatch log group |
+| ECS service (Fargate launch type) | Keeps 1 task running; registers/deregisters task IPs with the target group automatically |
+| Target group | Health-checks tasks at `GET /health`, expects `200` |
+| Application Load Balancer | Public entry point on port 80, forwards to the target group |
+| Two security groups | ALB SG: allow 80 from `0.0.0.0/0`. Task SG: allow 8000 only from the ALB SG |
+
+### Verification
+
+Local container test (before pushing to AWS):
+
+```bash
+docker build -t ask-my-docs-rag .
+docker run -d -p 8000:8000 ask-my-docs-rag
+curl -i http://localhost:8000/health
+```
+
+Deployed, through the public ALB:
+
+```bash
+curl -i http://<alb-dns-name>/health
+curl -i http://<alb-dns-name>/mcp
+```
+
+Both return the same responses locally and on AWS — `200 {"status":"ok"}` from `/health`, and a `406`/"Client must accept text/event-stream" from `/mcp` (proof the MCP protocol layer itself is live, not just a generic health stub).
+
+### Screenshots
+
+**ECR — pushed image**
+
+![ECR image detail](docs/screenshots/01-ecr-image-detail.png)
+![ECR repository images](docs/screenshots/02-ecr-repo-images.png)
+
+**ECS — running task**
+
+![ECS cluster and running task](docs/screenshots/03-ecs-cluster-tasks.png)
+
+**Target group — passing the `/health` check**
+
+![Target group healthy](docs/screenshots/04-target-group-healthy.png)
+
+**Load balancer**
+
+![Load balancer overview](docs/screenshots/05-load-balancer-overview.png)
+
+**Live endpoint, publicly reachable**
+
+![Health endpoint in browser](docs/screenshots/06-health-endpoint-browser.png)
+
+### Known simplifications
+
+Documented honestly, since these are deliberate trade-offs for a portfolio deployment rather than oversights:
+
+- **Default VPC and public subnets**, no custom VPC or NAT Gateway. The Fargate task is given a public IP directly (`assignPublicIp=ENABLED`) so it can reach ECR without needing a NAT Gateway — a paid piece of infrastructure that isn't necessary here. Inbound access is still fully blocked by the task's security group regardless of the public IP.
+- **Broad-ish IAM managed policies** (`AmazonECS_FullAccess`, etc.) rather than a hand-written least-privilege policy, to keep first-deployment setup tractable. Scoped to one purpose-built IAM user, not root.
+- **No HTTPS/TLS** on the ALB (port 80 only) — no ACM certificate or custom domain set up for this portfolio deployment.
+- **No autoscaling** — a fixed `desired-count 1`, not tied to load.
+- **Manual teardown** — the ALB and Fargate task are stopped between demos (both are billed hourly, not part of AWS's always-free tier) using `aws ecs update-service --desired-count 0` followed by deleting the service, listener, ALB, target group, and security groups. One real gotcha hit during teardown: Fargate's `awsvpc` networking mode keeps the task's network interface (ENI) attached for a minute or two *after* the task shows as stopped, so security group deletion can fail with a `DependencyViolation` until that ENI actually releases.
 
 ---
 

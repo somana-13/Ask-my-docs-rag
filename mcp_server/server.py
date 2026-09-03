@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from experiments.run_experiment import (
     build_retriever,
@@ -13,7 +15,12 @@ from experiments.run_experiment import (
 )
 
 
-mcp = FastMCP("ask-my-docs-rag")
+mcp = FastMCP("ask-my-docs-rag",  host="0.0.0.0", port=8000)
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> JSONResponse:
+    return JSONResponse({"status": "ok"})
 
 DEFAULT_VARIANT = "dense_abstention"
 
@@ -215,4 +222,4 @@ def get_experiment_summary() -> dict:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="streamable-http")
