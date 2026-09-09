@@ -44,3 +44,74 @@ jobs:
             --dataset eval/ci_smoke_set.json \
             --output reports/ci_eval_results.json \
             --faithfulness-threshold 0.80
+
+  deploy:
+    needs: eval
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::985879611480:role/github-actions-deploy-role
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          ECR_REPOSITORY: ask-my-docs-rag
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Register new ECS task definition
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          ECR_REPOSITORY: ask-my-docs-rag
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cat > task-def.json <<JSON
+          {
+            "family": "ask-my-docs-rag",
+            "requiresCompatibilities": ["FARGATE"],
+            "networkMode": "awsvpc",
+            "cpu": "1024",
+            "memory": "3072",
+            "executionRoleArn": "arn:aws:iam::985879611480:role/ecsTaskExecutionRole",
+            "taskRoleArn": "arn:aws:iam::985879611480:role/ask-my-docs-task-role",
+            "runtimePlatform": {
+              "cpuArchitecture": "X86_64",
+              "operatingSystemFamily": "LINUX"
+            },
+            "containerDefinitions": [
+              {
+                "name": "ask-my-docs-rag",
+                "image": "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG",
+                "portMappings": [{"containerPort": 8000, "protocol": "tcp"}],
+                "essential": true,
+                "logConfiguration": {
+                  "logDriver": "awslogs",
+                  "options": {
+                    "awslogs-group": "/ecs/ask-my-docs-rag",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                  }
+                }
+              }
+            ]
+          }
+          JSON
+          aws ecs register-task-definition --cli-input-json file://task-def.json

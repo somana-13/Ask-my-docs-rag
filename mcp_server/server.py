@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
-
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+from src.guardrails.bedrock_guardrails import check_input, check_output
 from experiments.run_experiment import (
     build_retriever,
     get_source_from_result,
@@ -13,7 +15,12 @@ from experiments.run_experiment import (
 )
 
 
-mcp = FastMCP("ask-my-docs-rag")
+mcp = FastMCP("ask-my-docs-rag",  host="0.0.0.0", port=8000)
+
+
+@mcp.custom_route("/health", methods=["GET"])
+async def health_check(request: Request) -> JSONResponse:
+    return JSONResponse({"status": "ok"})
 
 DEFAULT_VARIANT = "dense_abstention"
 
@@ -154,6 +161,17 @@ def answer_question(question: str, variant: str = DEFAULT_VARIANT) -> dict:
 
     This is intentionally extractive/simple for now. It does not call an LLM.
     """
+    input_check = check_input(question)
+    if input_check["intervened"]:
+        return {
+            "question": question,
+            "variant": variant,
+            "answered": False,
+            "answer": input_check["safe_text"],
+            "citations": [],
+            "guardrail_intervened": True,
+        }
+
     search_output = search_docs(question=question, variant=variant, top_k=5)
     results = search_output["results"]
 
@@ -164,6 +182,7 @@ def answer_question(question: str, variant: str = DEFAULT_VARIANT) -> dict:
             "answered": False,
             "answer": "I could not find strong enough supporting evidence in the indexed documentation.",
             "citations": [],
+            "guardrail_intervened": False,
         }
 
     citations = [
@@ -186,12 +205,15 @@ def answer_question(question: str, variant: str = DEFAULT_VARIANT) -> dict:
         f"{evidence_text}"
     )
 
+    output_check = check_output(answer, query=question, grounding_source=evidence_text)
+
     return {
         "question": question,
         "variant": variant,
-        "answered": True,
-        "answer": answer,
-        "citations": citations,
+        "answered": not output_check["intervened"],
+        "answer": output_check["safe_text"],
+        "citations": citations if not output_check["intervened"] else [],
+        "guardrail_intervened": output_check["intervened"],
     }
 
 
@@ -215,4 +237,4 @@ def get_experiment_summary() -> dict:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    mcp.run(transport="streamable-http")
