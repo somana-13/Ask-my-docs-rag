@@ -383,7 +383,7 @@ The gate exits with code `1` if any metric falls below threshold.
 
 ---
 
-## GitHub Actions
+## GitHub Actions: CI and CD
 
 The workflow is defined in:
 
@@ -391,14 +391,29 @@ The workflow is defined in:
 .github/workflows/eval.yml
 ```
 
-It runs on pushes and pull requests to `main` and performs:
+It has two jobs. The second only exists because the first passed — deployment is gated behind the quality gate, not independent of it.
+
+### `eval` (CI) — runs on every push and pull request to `main`
 
 1. dependency installation
 2. syntax checks
 3. Agentic RAG CI smoke evaluation
 4. metric threshold validation
 
-The workflow was validated through a pull request run to confirm the CI gate executes end-to-end before merge.
+### `deploy` (CD) — runs only on an actual push to `main` (`needs: eval`, so only after it passes)
+
+1. authenticate to AWS via **OIDC federation** — no long-lived AWS credentials stored in GitHub at all. A dedicated IAM role (`github-actions-deploy-role`) trusts short-lived tokens from GitHub's own OIDC issuer, restricted by an exact-match condition on the token's `sub` claim (`repo:somana-13/Ask-my-docs-rag:ref:refs/heads/main`) — only a workflow run triggered by a push to this exact repo and branch can ever assume it, enforced at the AWS level independently of the workflow's own `if:` condition
+2. build the Docker image and push it to ECR, tagged with the **git commit SHA** (not just the floating `:latest`) — every deployed image is traceable to an exact commit, and a rollback means "redeploy this specific SHA"
+3. register a new ECS task definition revision referencing that image
+
+**Deliberately stops there.** It does not run `aws ecs update-service` — actually making a new revision live stays a manual, on-demand step. Automatically keeping the ECS service always running would mean the ALB and Fargate task billing continuously, which conflicts with the cost-conscious, spin-up-for-demos approach used throughout this deployment. The pipeline gets everything to "ready to deploy" automatically; going live is a deliberate choice, not an automatic side effect of merging code.
+
+The `github-actions-deploy-role`'s permissions are scoped tightly: ECR push actions restricted to this one repository's ARN, and `iam:PassRole` restricted to exactly the two roles the task definition actually references (`ecsTaskExecutionRole`, `ask-my-docs-task-role`) — not a wildcard, which would otherwise open a privilege-escalation path (pass an arbitrary, more powerful role to a service you control).
+
+Both jobs were validated with a real pull-request-to-merge cycle: a PR run confirmed `eval` passes and `deploy` correctly does *not* fire on a pull request event, then merging to `main` confirmed `deploy` runs automatically and successfully — building and pushing a new image and registering task definition revision 3, entirely without any manual AWS CLI command.
+
+![GitHub Actions run overview](docs/screenshots/13-github-actions-cicd.png)
+![Deploy job steps](docs/screenshots/14-github-actions-cicd-deploy.png)
 
 ---
 
